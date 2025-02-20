@@ -3,7 +3,6 @@ import z from 'zod'
 
 import { env } from '../env'
 import { accessInviteLink } from '../functions/access-invite-link'
-import { redis } from '../redis/client'
 
 export const accessInviteLinkRoute: FastifyPluginAsyncZod = async app => {
   app.get(
@@ -15,9 +14,7 @@ export const accessInviteLinkRoute: FastifyPluginAsyncZod = async app => {
         }),
         description: 'Amet in officia ullamco minim dolor.',
         response: {
-          201: z.object({
-            subscriberId: z.string(),
-          }),
+          302: z.null(),
         },
         summary: 'Access invite link nd redirects user',
         tags: ['referral'],
@@ -25,9 +22,8 @@ export const accessInviteLinkRoute: FastifyPluginAsyncZod = async app => {
     },
     async (request, reply) => {
       const { subscriberId } = request.params
-      await accessInviteLink({ subscriberId })
 
-      console.log(await redis.hgetall('referral:access-count'))
+      await accessInviteLink({ subscriberId })
 
       const redirectURL = new URL(env.WEB_URL)
 
